@@ -1,109 +1,55 @@
 <p align="center">
-  <a href="https://github.com/wundergraph/router-examples">
+  <a href="https://github.com/wundergraph/custom-router-builds">
     <img src="img.png" width="500px" alt="gRPC Plugin Demo" />
   </a>
 </p>
 
-<p align="center">Customizable examples for extending the Cosmo Router with custom modules and middleware.</p>
+<p align="center">A template project for building your own custom Cosmo router with custom modules.</p>
 
 <p align="center">
   <a href="https://cosmo-docs.wundergraph.com/router">Router Documentation</a> •
   <a href="https://cosmo-docs.wundergraph.com/router/custom-modules">Module Configuration</a>
 </p>
 
-## 🚀 Quick Start
-
-Get your custom Cosmo Router running in under 5 minutes! Choose your preferred approach below.
-
 ## 📁 Examples
 
-Each example is a self-contained router configuration with a custom module. You can copy the example directory to your own repository and start customizing it.
+For an example of how to write custom modules, check out the [Router Examples project](https://github.com/wundergraph/router-examples), which contains an example, "myModule", of a custom router module.
+This repository is designed to allow rapid, clean construction of custom routers with modules such that you 
 
-| Example             | Path                                       | Documentation                            | Description                                                      |
-| ------------------- | ------------------------------------------ | ---------------------------------------- | ---------------------------------------------------------------- |
-| **Complete Module** | [`examples/complete/`](examples/complete/) | [📖 README](examples/complete/README.md) | Advanced router customization with custom modules and middleware |
+## 🚀 How to Use this Project
+This project gives you a template for building a custom router with custom router modules. The "moduletemplate" package provides a basic implementation that can be loaded, documents how all of the hooks work, and does
+nothing. It serves as a minimal framework for custom router modules where you just need to modify a few variables and add function code for your module's logic.
 
-## 🔌 Go Production
+1. **Fork this repository** into your own. You can then use that forked repository as the basis for your router implementation. It's possible to have multiple forks that derive from a single "core" fork if, for instance, you
+want to have different routers running different module configurations without adding any form of configuration management to `main.go`.
+2. **Copy the moduletemplate** module for each new module you want to create. You can safely have multiple models, and the moduletemplate itself, so long as they each have different package name (per normal go standards).
+3. **Modify the new modules** to have correct package names and to implement the hooks you need. For any hook you don't need, we recommend removing the function and the interface guard to improve performance and simplify
+your code.
+4. **Create appropriate configuration entries** in config.yaml for any configuration settings you added, along with documentation on how they work. This isn't strictly necessary, as the config.yaml used in the container will be
+overridden by anything you provide on launch, but it's best practice to help people understand how your module is configured.
+5. **Run go mod tidy** to ensure all dependencies are up to date.
+6. **Build the new router image** by running `make docker-build` or just `make`. By default, this will build a "cosmo-custom-router:latest" container image for linux/amd64. You can customize this by setting the `IMAGE_NAME`, `IMAGE_TAG`, `TARGETOS`, and `TARGETARCH` variables to build for a different platform, apply a different tag, or name the router image something different entirely.
 
-### Packaging and Running the Router
+### How the build works
+The Makefile runs `go mod tidy` then triggers a docker build process, which is configured in the Dockerfile. The Dockerfile loads an appropriate golang layer for build, builds the router for the target architecture, then
+creates a second stage that's distroless into which the statically linked router is placed.
 
-There are two way to produce a deployable artifact:
+### Updating the router
+Whenever a new version of the router is released, this repository is updated to use that new version. Thus, to update the router, you need only track this repository as your upstream:
 
-<details>
-<summary><strong>🐳 Docker Image (Recommended)</strong></summary>
+` git remote add upstream https://github.com/wundergraph/custom-router-builds.git `
 
-<br/>
+Then when there's a new router release and you want to upgrade to it, presuming the branch you want to update to is `main`:
 
-**Build the image:**
-
-```bash
-docker build \
-  --platform linux/amd64 \
-  --build-arg TARGETOS=linux \
-  --build-arg TARGETARCH=amd64 \
-  --build-arg VERSION=$(git describe --tags --always --dirty) \
-  --build-arg COMMIT=$(git rev-parse HEAD) \
-  --build-arg DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-  -t myrouter:latest .
+```
+git fetch upstream
+git checkout main 
+git merge upstream/main
+go mod tidy
+make
 ```
 
-**Multi-arch builds:** The Dockerfile supports multiple architectures. For custom builds, set `TARGETOS` and `TARGETARCH` (e.g., `darwin/arm64` for Mac M1).
-
-**Run the router:**
-
-```bash
-docker run --name myrouter --rm -p 3002:3002 \
-  -e LISTEN_ADDR=0.0.0.0:3002 \
-  -e DEMO_MODE=true \
-  myrouter:latest
-```
-
-Visit **[localhost:3002](http://localhost:3002)** to see your router in action!
-
-</details>
-
-<details>
-<summary><strong>Go Binary (Requires Go 1.25+)</strong></summary>
-
-<br/>
-
-**Requirements:** Go 1.25+
-
-**Build & Run:**
-
-```bash
-go mod download
-go build -o router main.go && chmod +x router
-./router
-```
-
-Visit **[localhost:3002](http://localhost:3002)** to see your router in action!
-
-</details>
-
----
-
-### Connecting to WunderGraph Cloud
-
-The router requires a graph api token to serve your supergraph.
-Follow the instructions in [WunderGraph Cloud Onboarding](https://cosmo-docs.wundergraph.com/getting-started/cosmo-cloud-onboarding) to get your token.
-
-## 🔄 Upgrade Router
-
-You can upgrade the router in each example directory by following the instructions below.
-
-1. Get the commit SHA from [releases page](https://github.com/wundergraph/cosmo/releases?q=router%40&expanded=false)
-2. Navigate to your router directory (where `go.mod` exists)
-3. Copy the `replace` directives from [`examples/complete/go.mod`](examples/complete/go.mod) into your `go.mod`
-4. Update dependencies:
-   ```bash
-   cd examples/complete  # your example directory
-   go get github.com/wundergraph/cosmo/router@<commit-sha>
-   ```
-5. Run `go get` from the directory containing `go.mod`
-
-> [!CAUTION]
-You **must** keep the `replace` directives in your `go.mod` to pin the dependency versions used by the router. We cannot guarantee compatibility in custom setups that omit these replacements. See [`examples/complete/go.mod`](examples/complete/go.mod) for the required `replace` block.
+You shouldn't run into merge conflicts if you've followed the instructions above and do not change this README.md file.
 
 ## 🤝 Contributing
 
