@@ -27,8 +27,9 @@ want to have different routers running different module configurations without a
 your code.
 4. **Create appropriate configuration entries** in config.yaml for any configuration settings you added, along with documentation on how they work. This isn't strictly necessary, as the config.yaml used in the container will be
 overridden by anything you provide on launch, but it's best practice to help people understand how your module is configured.
-5. **Run go mod tidy** to ensure all dependencies are up to date.
-6. **Build the new router image** by running `make docker-build` or just `make`. By default, this will build a "cosmo-custom-router:latest" container image for linux/amd64. You can customize this by setting the `IMAGE_NAME`, `IMAGE_TAG`, `TARGETOS`, and `TARGETARCH` variables to build for a different platform, apply a different tag, or name the router image something different entirely.
+5. **Load your modules** by adding them to `main.go`. Each module is loaded using the `_ <fqdn-packagename>` syntax. The order you put them here doesn't matter; the `priority` variable you set in the module.go file determines load order.
+6. **Run go mod tidy** to ensure all dependencies are up to date.
+7. **Build the new router image** by running `make docker-build` or just `make`. By default, this will build a "cosmo-custom-router:latest" container image for linux/amd64. You can customize this by setting the `IMAGE_NAME`, `IMAGE_TAG`, `TARGETOS`, and `TARGETARCH` variables to build for a different platform, apply a different tag, or name the router image something different entirely.
 
 ### How the build works
 The Makefile runs `go mod tidy` then triggers a docker build process, which is configured in the Dockerfile. The Dockerfile loads an appropriate golang layer for build, builds the router for the target architecture, then
