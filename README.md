@@ -14,7 +14,7 @@
 ## 📁 Examples
 
 For an example of how to write custom modules, check out the [Router Examples project](https://github.com/wundergraph/router-examples), which contains an example, "myModule", of a custom router module.
-This repository is designed to allow rapid, clean construction of custom routers with modules such that you 
+This repository is designed to allow rapid, clean construction of custom routers with modules such that you can upgrade router versions simply by tracking our upstream and running `make`.
 
 ## 🚀 How to Use this Project
 This project gives you a template for building a custom router with custom router modules. The "moduletemplate" package provides a basic implementation that can be loaded, documents how all of the hooks work, and does
