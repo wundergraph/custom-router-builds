@@ -50,7 +50,14 @@ go mod tidy
 make
 ```
 
-You shouldn't run into merge conflicts if you've followed the instructions above and do not change this README.md file.
+You shouldn't run into merge conflicts if you've followed the instructions above and do not change this README.md file. We recommend adding README.md files in each module and, if you want
+to add something to the root, either add your text to the end of this file or add a new markdown file instead.
+
+If you want to update to a _specific_ router version, you can use `git fetch upstream tag router@<version>`, where `<version>` is the specific router version. For instance,
+if you want to update to router 0.355.0, instead of just `git fetch upstream`, you'd use `git fetch upstream tag router@0.357.0`. **Note** that:
+
+- The earliest version supported by this repository is router@0.357.0.
+- Updates to this repository's router version occur through automation, so updates may take as long as a day to occur.
 
 ## 🤝 Contributing
 
