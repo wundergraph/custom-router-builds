@@ -1,0 +1,50 @@
+name: Create Release on Merge
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Only run if the last commit was a merged Dependabot PR bumping cosmo
+    if: contains(github.event.head_commit.message, 'github.com/wundergraph/cosmo')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Extract Cosmo Version
+        id: get_version
+        run: |
+          # Query the pinned version of wundergraph/cosmo from go.mod
+          COSMO_VER=$(go list -m -f '{{.Version}}' github.com/wundergraph/cosmo)
+          echo "version=$COSMO_VER" >> "$GITHUB_OUTPUT"
+
+      - name: Check if Tag Already Exists
+        id: check_tag
+        run: |
+          TAG="${{ steps.get_version.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          gh release create "$TAG" \
+            --title "Release $TAG" \
+            --generate-notes
+        env:
+          TAG: ${{ steps.get_version.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

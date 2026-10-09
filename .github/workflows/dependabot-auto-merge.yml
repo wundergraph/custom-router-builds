@@ -1,0 +1,39 @@
+name: Dependabot Auto-Approve and Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      # Optional filter: only proceed if update matches wundergraph/cosmo
+      - name: Check dependency name
+        if: contains(steps.metadata.outputs.dependency-names, 'github.com/wundergraph/cosmo')
+        run: echo "Target dependency detected."
+
+      - name: Approve PR
+        if: contains(steps.metadata.outputs.dependency-names, 'github.com/wundergraph/cosmo')
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable Auto-Merge
+        if: contains(steps.metadata.outputs.dependency-names, 'github.com/wundergraph/cosmo')
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
