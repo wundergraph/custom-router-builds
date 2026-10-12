@@ -7,4 +7,4 @@ updates:
     open-pull-requests-limit: 10
     allow:
       - dependency-name: "github.com/wundergraph/cosmo"
-    versioning-strategy: increase
+    # versioning-strategy: increase
