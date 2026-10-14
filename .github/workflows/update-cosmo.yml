@@ -1,0 +1,54 @@
+name: Check & Update Cosmo Dependency
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Runs daily at 06:00 UTC
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  update-dependency:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Find Latest Cosmo Router Release Tag
+        id: cosmo_tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Query GitHub API for the latest tag matching 'router@'
+          LATEST_TAG=$(gh api repos/wundergraph/cosmo/tags --jq '.[].name' | grep -E '^router@' | head -n 1)
+          echo "Found tag: $LATEST_TAG"
+          echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+
+          # Extract raw semver (e.g., 0.357.0 from router@0.357.0)
+          VERSION=${LATEST_TAG#router@}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update go.mod
+        run: |
+          TAG="${{ steps.cosmo_tag.outputs.tag }}"
+          # Go can resolve git tags directly using @<tag_name> even if non-semver,
+          # which Go then normalizes into a valid pseudo-version in go.mod
+          go get github.com/wundergraph/cosmo/router@$TAG
+          go mod tidy
+
+      - name: Create Pull Request if Changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "build(deps): bump github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.version }}"
+          title: "Bumps github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.version }}"
+          body: |
+            Bumps `github.com/wundergraph/cosmo/router` to upstream tag `${{ steps.cosmo_tag.outputs.tag }}`.
+          branch: "update-cosmo-router"
+          delete-branch: true
