@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Query GitHub API for the latest tag matching 'router@'
-          LATEST_TAG=$(gh api repos/wundergraph/cosmo/tags --jq '.[].name' | grep -E '^router@' | head -n 1)
+          LATEST_TAG=$(gh release list -R wundergraph/cosmo --jq '.[].name' --json name | grep -E '^router@' | head -n 1)
           echo "Found tag: $LATEST_TAG"
           echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
 
