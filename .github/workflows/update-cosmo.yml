@@ -30,12 +30,7 @@ jobs:
           echo "Found tag: $LATEST_TAG"
           echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
 
-          COMMIT_SHA=$(gh api graphql -F owner='wundergraph' -F name='cosmo' -F tag="$LATEST_TAG" \ 
-          -f query='query($name: String!, $owner: String!, $tag: String!) \
-          { repository(owner: $owner, name: $name)  \
-          { ref(qualifiedName: $tag) \ 
-          { name target { oid __typename ... on Commit { oid } ... on Tag {target { ... on Commit { oid } } } } } } } ' \
-          -q '.data.repository.ref.target | (.target.oid // .oid)')
+          COMMIT_SHA=$(gh api graphql -F owner='wundergraph' -F name='cosmo' -F tag="$LATEST_TAG" -f query='query($name: String!, $owner: String!, $tag: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: $tag) { name target { oid __typename ... on Commit { oid } ... on Tag {target { ... on Commit { oid } } } } } } } ' -q '.data.repository.ref.target | (.target.oid // .oid)' )
           echo "Commit SHA for $LATEST_TAG = $COMMIT_SHA"
 
       - name: Update go.mod
