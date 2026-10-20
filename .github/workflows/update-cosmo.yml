@@ -30,11 +30,18 @@ jobs:
           echo "Found tag: $LATEST_TAG"
           echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
 
+          # Get commit hash for the tagged version
           COMMIT_SHA=$(gh api graphql -F owner='wundergraph' -F name='cosmo' -F tag="$LATEST_TAG" -f query='query($name: String!, $owner: String!, $tag: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: $tag) { name target { oid __typename ... on Commit { oid } ... on Tag {target { ... on Commit { oid } } } } } } } ' -q '.data.repository.ref.target | (.target.oid // .oid)' )
           echo "Commit SHA for $LATEST_TAG = $COMMIT_SHA"
+          echo "commit=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+
+          # Extract raw semver (e.g., 0.357.0 from router@0.357.0)
+          VERSION=${LATEST_TAG#router@}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Update go.mod
         run: |
+          COMMIT_SHA="${{ steps.cosmo_tag.outputs.commit }}"
           go get github.com/wundergraph/cosmo/router@$COMMIT_SHA
           go mod tidy
 
@@ -42,8 +49,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "build(deps): bump github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.tag }}"
-          title: "Bumps github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.tag }}"
+          commit-message: "build(deps): bump github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.version }}"
+          title: "Bumps github.com/wundergraph/cosmo/router to ${{ steps.cosmo_tag.outputs.version }}"
           body: |
             Bumps `github.com/wundergraph/cosmo/router` to upstream tag `${{ steps.cosmo_tag.outputs.tag }}`.
           branch: "update-cosmo-router"
