@@ -3,7 +3,7 @@ module github.com/wundergraph/custom-router-builds
 go 1.26.0
 
 require (
-	github.com/wundergraph/cosmo/router v0.0.0-20261021153442-bf4e68cc4ff1
+	github.com/wundergraph/cosmo/router v0.0.0-20261028160503-2af59274abb0
 	go.uber.org/zap v1.27.1
 )
 
@@ -13,7 +13,7 @@ require (
 	github.com/KimMachineGun/automemlimit v0.6.1 // indirect
 	github.com/MicahParks/jwkset v0.11.0 // indirect
 	github.com/MicahParks/keyfunc/v3 v3.6.2 // indirect
-	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/andybalholm/brotli v1.2.7 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.14.2-0.20260130195850-5c64bed4577e // indirect
@@ -126,7 +126,7 @@ require (
 	github.com/vbatts/tar-split v0.12.1 // indirect
 	github.com/wundergraph/astjson v1.1.0 // indirect
 	github.com/wundergraph/go-arena v1.3.0 // indirect
-	github.com/wundergraph/graphql-go-tools/v2 v2.30.0 // indirect
+	github.com/wundergraph/graphql-go-tools/v2 v2.30.4 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
