@@ -46,6 +46,7 @@ jobs:
           go mod tidy
 
       - name: Create Pull Request if Changed
+        id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -55,3 +56,41 @@ jobs:
             Bumps `github.com/wundergraph/cosmo/router` to upstream tag `${{ steps.cosmo_tag.outputs.tag }}`.
           branch: "update-cosmo-router"
           delete-branch: true
+
+      - name: Auto-Merge Pull Request
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Merging pull request: $PR_URL"
+          # Attempt auto-merge if repo settings allow it; otherwise merge immediately via squash
+          gh pr merge "$PR_URL" --auto --squash --delete-branch || gh pr merge "$PR_URL" --squash --delete-branch
+
+          # Wait up to 30s to ensure the PR is merged into main
+          for i in {1..15}; do
+            STATE=$(gh pr view "$PR_URL" --json state --jq .state)
+            if [ "$STATE" = "MERGED" ]; then
+              echo "PR successfully merged."
+              break
+            fi
+            echo "Waiting for PR to merge... (attempt $i)"
+            sleep 2
+          done
+
+      - name: Create GitHub Release
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          TAG: ${{ steps.cosmo_tag.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch --tags origin
+          if git rev-parse "$TAG" >/dev/null 2>&1 || gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release or tag $TAG already exists. Skipping."
+          else
+            echo "Creating release for $TAG"
+            gh release create "$TAG" \
+              --target main \
+              --title "Release $TAG" \
+              --generate-notes
+          fi
