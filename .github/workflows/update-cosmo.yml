@@ -105,5 +105,5 @@ jobs:
           echo "Creating release for $TAG"
           gh release create "$TAG" \
             --target main \
-            --title "Release $TAG" \
-            --generate-notes
+            --title "$TAG" \
+            --notes "bumps router to tracked upstream release $TAG"
