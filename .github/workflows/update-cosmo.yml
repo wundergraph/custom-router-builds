@@ -2,8 +2,8 @@ name: Check & Update Cosmo Dependency
 
 on:
   schedule:
-    - cron: '0 6 * * *' # Runs daily at 06:00 UTC
-  workflow_dispatch:      # Allows manual trigger
+    - cron: '*/30 * * * *' # Runs every 30 minutes
+  workflow_dispatch:        # Allows manual trigger
 
 jobs:
   update-dependency:
@@ -14,11 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
 
       - name: Find Latest Cosmo Router Release Tag
         id: cosmo_tag
@@ -39,13 +34,36 @@ jobs:
           VERSION=${LATEST_TAG#router@}
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Check if Tag Already Released
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.cosmo_tag.outputs.tag }}"
+          git fetch --tags origin
+          if git rev-parse "$TAG" >/dev/null 2>&1 || gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists in this repository. Skipping remaining steps."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Release $TAG does not exist. Proceeding with update."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Go
+        if: steps.check_release.outputs.skip != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
       - name: Update go.mod
+        if: steps.check_release.outputs.skip != 'true'
         run: |
           COMMIT_SHA="${{ steps.cosmo_tag.outputs.commit }}"
           go get github.com/wundergraph/cosmo/router@$COMMIT_SHA
           go mod tidy
 
       - name: Create Pull Request if Changed
+        if: steps.check_release.outputs.skip != 'true'
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
@@ -58,7 +76,7 @@ jobs:
           delete-branch: true
 
       - name: Auto-Merge Pull Request
-        if: steps.cpr.outputs.pull-request-number != ''
+        if: steps.check_release.outputs.skip != 'true' && steps.cpr.outputs.pull-request-number != ''
         env:
           PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,18 +97,13 @@ jobs:
           done
 
       - name: Create GitHub Release
-        if: steps.cpr.outputs.pull-request-number != ''
+        if: steps.check_release.outputs.skip != 'true' && steps.cpr.outputs.pull-request-number != ''
         env:
           TAG: ${{ steps.cosmo_tag.outputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch --tags origin
-          if git rev-parse "$TAG" >/dev/null 2>&1 || gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release or tag $TAG already exists. Skipping."
-          else
-            echo "Creating release for $TAG"
-            gh release create "$TAG" \
-              --target main \
-              --title "$TAG" \
-              --notes "bumps router to tracked upstream release $TAG"
-          fi
+          echo "Creating release for $TAG"
+          gh release create "$TAG" \
+            --target main \
+            --title "Release $TAG" \
+            --generate-notes
