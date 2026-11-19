@@ -3,7 +3,7 @@ module github.com/wundergraph/custom-router-builds
 go 1.26.0
 
 require (
-	github.com/wundergraph/cosmo/router v0.0.0-20261119082104-febd2d05566f
+	github.com/wundergraph/cosmo/router v0.0.0-20261119114322-7d95db310db6
 	go.uber.org/zap v1.27.1
 )
 
