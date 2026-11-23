@@ -3,7 +3,7 @@ module github.com/wundergraph/custom-router-builds
 go 1.26.0
 
 require (
-	github.com/wundergraph/cosmo/router v0.0.0-20261119200630-89c2ac93e9ad
+	github.com/wundergraph/cosmo/router v0.0.0-20261123105913-0b71a39e432e
 	go.uber.org/zap v1.27.1
 )
 
@@ -71,7 +71,6 @@ require (
 	github.com/jensneuse/abstractlogger v0.0.4 // indirect
 	github.com/jensneuse/byte-template v0.0.0-20231025215717-69252eb3ed56 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/kingledion/go-tools v0.6.0 // indirect
 	github.com/klauspost/compress v1.19.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
@@ -92,7 +91,6 @@ require (
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/petermattis/goid v0.0.0-20260113132338-7c7de50cc741 // indirect
-	github.com/phf/go-queue v0.0.0-20170504031614-9abe38d0371d // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/posthog/posthog-go v1.5.5 // indirect
@@ -126,7 +124,7 @@ require (
 	github.com/vbatts/tar-split v0.12.1 // indirect
 	github.com/wundergraph/astjson v1.1.0 // indirect
 	github.com/wundergraph/go-arena v1.3.0 // indirect
-	github.com/wundergraph/graphql-go-tools/v2 v2.32.1 // indirect
+	github.com/wundergraph/graphql-go-tools/v2 v2.32.2 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
