@@ -346,8 +346,8 @@ github.com/vektah/gqlparser/v2 v2.5.30 h1:EqLwGAFLIzt1wpx1IPpY67DwUujF1OfzgEyDsL
 github.com/vektah/gqlparser/v2 v2.5.30/go.mod h1:D1/VCZtV3LPnQrcPBeR/q5jkSQIPti0uYCP/RI0gIeo=
 github.com/wundergraph/astjson v1.1.0 h1:xORDosrZ87zQFJwNGe/HIHXqzpdHOFmqWgykCLVL040=
 github.com/wundergraph/astjson v1.1.0/go.mod h1:h12D/dxxnedtLzsKyBLK7/Oe4TAoGpRVC9nDpDrZSWw=
-github.com/wundergraph/cosmo/router v0.0.0-20261124160326-c23965f9dbfe h1:t/ygpaXGWEVt/eOsTNw/xL4zKI8V2n7kjxqSGLVoFxk=
-github.com/wundergraph/cosmo/router v0.0.0-20261124160326-c23965f9dbfe/go.mod h1:b3SLn242oU69RMcW2U/BdeoFK9L52pEqeu2ZuIo+uQw=
+github.com/wundergraph/cosmo/router v0.0.0-20261125124859-dde5be5c1039 h1:dEAvc/uMX1skwUW8idE3G7+E5cweCUhYcIMao9p3Rzo=
+github.com/wundergraph/cosmo/router v0.0.0-20261125124859-dde5be5c1039/go.mod h1:b3SLn242oU69RMcW2U/BdeoFK9L52pEqeu2ZuIo+uQw=
 github.com/wundergraph/go-arena v1.3.0 h1:n0ng5a1vbd8YGq1u3rMr0vPU5f6AZ1BXIiUhL1UIok8=
 github.com/wundergraph/go-arena v1.3.0/go.mod h1:ROOysEHWJjLQ8FSfNxZCziagb7Qw2nXY3/vgKRh7eWw=
 github.com/wundergraph/graphql-go-tools/v2 v2.33.0 h1:Jq5moW4JTbykTD9gGtjALDRDi1QqvSGTcPbOowVMF5s=
